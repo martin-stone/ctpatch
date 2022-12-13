@@ -2,22 +2,22 @@
 
 In Python, read, modify and write .syx patch files for the Novation Circuit Tracks.
 
-See example.py for an example of usage.
-
 Requires Python version >= 3.10
 
-The Python type annotations make editor autocomplete quite effective, 
+See [example.py](example.py) for an example of reading, modifying, and writing patches, and sending patches to the device.
+
+The Python type annotations make editor autocomplete quite effective,
 but you can also see the structure of the loaded patch object with Python's "pretty print"...
 
 ```python
 import ctpatch
 from pprint import pprint
 
-p = ctpatch.read_syx("example.syx")
-pprint(p)
+patch = ctpatch.read_syx("example.syx")
+pprint(patch)
 ```
 
-... outputs ...
+This produces the following output ...
 
 ```python
 PatchSysex(header=Header(sysex=240,
