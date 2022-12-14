@@ -58,6 +58,7 @@ def read_type(field_type) -> dict:
 PATCH_BYTES = 350
 NOVATION_ID = b"\x00\x20\x29"
 CIRCUIT_TRACKS_ID = 0x64
+CIRCUIT_ORIGINAL_ID = 0x60
 
 
 class SysexCommand(IntEnum):
@@ -284,7 +285,7 @@ class Header:
     sysex: int = 0xf0
     mfr_id: bytes = field(default=NOVATION_ID, **format("3s"))
     prod_type: int = 0x01
-    prod_num: int = 0x64
+    prod_num: int = CIRCUIT_TRACKS_ID
 
 
 @dataclass
@@ -498,7 +499,7 @@ def write_syx(syx_filename: str | Path, patch: PatchSysex):
 
 def validate(patch: PatchSysex):
     assert patch.header.mfr_id == NOVATION_ID
-    assert patch.header.prod_num == CIRCUIT_TRACKS_ID
+    assert patch.header.prod_num in (CIRCUIT_TRACKS_ID, CIRCUIT_ORIGINAL_ID)
     assert len(patch.oscillators) == 2
     assert len(patch.envelopes) == 3
     assert len(patch.mod_matrix) == 20
