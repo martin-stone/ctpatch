@@ -475,9 +475,9 @@ class CurrentPatchDumpRequestCommand:
 
 @dataclass
 class PatchDumpRequest:
-    header: Header = Header()
-    command: CurrentPatchDumpRequestCommand = CurrentPatchDumpRequestCommand()
-    footer: Footer = Footer()
+    header: Header = field(default_factory=Header)
+    command: CurrentPatchDumpRequestCommand = field(default_factory=CurrentPatchDumpRequestCommand)
+    footer: Footer = field(default_factory=Footer)
 
 
 def read_syx(syx_filename: str | Path) -> PatchSysex:
