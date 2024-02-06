@@ -4,11 +4,16 @@ import time
 import rtmidi
 import ctpatch
 
+# On debian 12 needed to add a link to a .so file for python-rtmidi to work:
+# https://github.com/SpotlightKid/python-rtmidi/issues/138
+
+
 
 def main():
-    if len(sys.argv) > 1:
-        print(f"Reading file {sys.argv[1]}")
-        bank = Path(sys.argv[1]).read_bytes()
+    if len(sys.argv) > 2:
+        patches_dest_start = int(sys.argv[1])
+        print(f"Reading file {sys.argv[2]}")
+        bank = Path(sys.argv[2]).read_bytes()
         patches = [bank[i:i+ctpatch.PATCH_BYTES] for i in range(0, len(bank), ctpatch.PATCH_BYTES)]
         assert all(patch[0] == 0xf0 and patch[-1] == 0xf7 for patch in patches)
         with ct_out() as midiout:
@@ -16,13 +21,15 @@ def main():
 
                 ctp = ctpatch.decode(patch)
                 print(ctp.meta.name)
-                ctp.command = ctpatch.ReplacePatchCommand(pack_index=1, patch_index=i)
+                idest = i+patches_dest_start
+                ctp.command = ctpatch.ReplacePatchCommand(pack_index=1, patch_index=idest)
 
                 sysex = ctpatch.encode(ctp)
-                print(f"Sending {len(sysex)} bytes. {i+1} of {len(patches)}")
+                print(f"Sending {len(sysex)} bytes to patch {idest}. {i+1} of {len(patches)}")
                 midiout.send_message(sysex)
                 time.sleep(0.5)
-
+    else:
+        print("Need dest index and bank syx file")
     # current = get_current_patch()
     # print(current.patch.Name.decode("utf8"))
 
@@ -70,6 +77,7 @@ def ct_in():
 
 def circuit_port(midi):
     ports: list = midi.get_ports()
+    print(ports)
     return next(i for i, name in enumerate(ports) if "Circuit Tracks" in name)
 
 
@@ -84,8 +92,9 @@ def note():
 
 
 if __name__ == "__main__":
+    #circuit_port(rtmidi.MidiOut())
     main()
     # p = get_current_patch()
     # print(p.patch.Name)
-    # note()
+    #note()
     # write_sysex()

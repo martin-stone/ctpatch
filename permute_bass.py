@@ -6,18 +6,18 @@ import ctpatch
 
 
 def main():
-    base_filename = r"C:\martin\docs\CircuitTracks\Base Bass.syx"
-    out_dir = Path(r"C:\martin\docs\CircuitTracks")
+    base_filename = Path(r"~/Documents/CircuitTracks/Base Bass.syx").expanduser()
+    out_dir = Path(r"~/Documents/CircuitTracks").expanduser()
     base = ctpatch.read_syx(base_filename)
 
     indexed_patches = combinations(base)
     for i, p in indexed_patches:
-        name = p.patch.name.decode('utf8').strip()
+        name = p.meta.name.decode('utf8').strip()
         ctpatch.write_syx(out_dir / f"{i:02} {name}.syx", p)
 
     patch_range = min(i for i, _ in indexed_patches), max(i for i, _ in indexed_patches)
     bank = concat_bank(indexed_patches)
-    (out_dir / f"bank - {patch_range[0]:02}-{patch_range[1]:02}.syx").write_bytes(bank)
+    (out_dir / f"bank-bass-{patch_range[0]:02}-{patch_range[1]:02}.syx").write_bytes(bank)
 
 
 def combinations(base: ctpatch.PatchSysex):
@@ -44,7 +44,7 @@ def combinations(base: ctpatch.PatchSysex):
         for _, funcs, _ in combination:
             for func in funcs:
                 func(out)
-        out.patch.name = name.encode("utf8")
+        out.meta.name = name.encode("utf8")
         return index, out
 
     indexed_patches = sorted(apply(c, base) for c in product(*dimensions))
